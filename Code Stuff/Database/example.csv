@@ -1,5 +1,0 @@
-Name, Building, Connections, Type
-CTW_Back_Entrance, Tower-CTW, CTE_Back_Entrance|CTE_Front_Entrance, Entrance
-CTW_Front_Entrance, Tower-CTW, CTW_Back_Entrance, Entrance
-CTE_Back_Entrance, Tower-CTE, CTW_Back_Entrance|CTE_Front_Entrance, Entrance
-CTE_Front_Entrance, Tower-CTE, CTE_Back_Entrance, Entrance
