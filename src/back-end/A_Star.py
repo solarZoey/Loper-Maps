@@ -104,4 +104,17 @@ class Graph:
                 tentative_g = current.g + edge.weight # Calculates tentative cost to reach neighbor from initial node
 
                 if tentative_g < neighbor.g: # If new path is better
-                    print(f"Updating G Cost: ")
+                    print(f"Updating G Cost: {current.name} to {neighbor.name}")
+                    neighbor.g = tentative_g # Updates neighbor's g cost to cheaper path
+                    print(f"\nCalculating Heurisitc for {neighbor.name}")
+                    neighbor.h = self.calcHeuristic(neighbor, goal)
+                    neighbor.f = neighbor.g + neighbor.h # Sum of heuristic value and g cost
+
+                    if neighbor in queue:
+                        queue.remove(neighbor)
+                    if neighbor not in processed:
+                        queue.append(neighbor)
+                    
+                queue.sort(key=lambda node: node.f)
+
+        print("\nNo Goal Found...")
