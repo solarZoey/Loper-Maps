@@ -6,8 +6,11 @@ https://vite.dev/guide/
 
 # Running Instructions
 
+- cd into this directory
+- `npm run dev`
+- open link displayed
+
 WIP
-<!-- Have a recent version [Node.js](https://nodejs.org/en/download) installed (I have version `v24.13.1`). -->
 
 
 
