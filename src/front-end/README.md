@@ -1,12 +1,12 @@
 # How This Works
 
-I'm using a React + Vite framework, and created a template using `npm create vite@latest front-end -- --template react`
+This front-end uses a React + Vite framework, and created a template using `npm create vite@latest front-end -- --template react`
 
 https://vite.dev/guide/
 
 # Running Instructions
 
-- cd into this directory
+- cd into this directory from a terminal
 - `npm run dev`
 - open link displayed
 
