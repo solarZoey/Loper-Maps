@@ -31,13 +31,14 @@ Gavin -
 
 Progress Made
 
+Nova - 
+
 Christian -
 
 Cooper - I started listing down each subnode with their longitude and latitude coordinates into our Excel spreadsheet that contains information on the building nodes.          Following this, I added these new entries to my code in order to add them to the A* graph. There are a lot of subnodes still remaning that need to be                  initialized in the code; most of what has been added is from the east side of UNK's campus. After testing the code with the new subnodes added, there were             not any runtime errors and the total distance seems to be calculating correctly. However, there some current things happening with A* itself that might not            be correct. I will discuss these issue in the "Challenges and Issues Encountered" section. Overall, decent progess has been made, but there is still a lot of          work that needs to be done.
 
 Gavin - 
 
-Nova - 
 -----------------------------------------------------------------------------------------
 
 Challenges or Issues Encountered:
