@@ -14,7 +14,9 @@ function App() {
 
 	return (
 		<>
-			<p>test page</p>
+			<h1>Loper Maps</h1>
+			<p><i>UNK campus navigation</i></p>
+			<p>Move the view with the arrow keys! Zoom in and out with "=" and "-" respectively!</p>
 			<canvas id="gl_canvas" />
 			<script async type="module" src="/src/graphics.js" onLoad={console.log("graphics script loaded.")}/>
 		</>
