@@ -127,10 +127,6 @@ function main() {
 
 }
 
-function bindVertices(vertices, gl) {
-	gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
-}
-
 // Initialize a shader program, so WebGL knows how to draw our data
 function initShaderProgram(gl, vsSource, fsSource) {
 	const vertexShader = loadShader(gl, gl.VERTEX_SHADER, vsSource);
@@ -178,59 +174,67 @@ function loadShader(gl, type, source) {
 }
 
 function resizeCanvasToDisplaySize(canvas) {
-    // Lookup the size the browser is displaying the canvas in CSS pixels.
-    const displayWidth  = canvas.clientWidth;
-    const displayHeight = canvas.clientHeight;
+		// Lookup the size the browser is displaying the canvas in CSS pixels.
+		const displayWidth  = canvas.clientWidth;
+		const displayHeight = canvas.clientHeight;
 
-    // Check if the canvas is not the same size.
-    const needResize = canvas.width  !== displayWidth ||
-                       canvas.height !== displayHeight;
+		// Check if the canvas is not the same size.
+		const needResize = canvas.width  !== displayWidth ||
+											 canvas.height !== displayHeight;
 
-    if (needResize) {
-      // Make the canvas the same size
-      canvas.width  = displayWidth;
-      canvas.height = displayHeight;
-    }
+		if (needResize) {
+			// Make the canvas the same size
+			canvas.width  = displayWidth;
+			canvas.height = displayHeight;
+		}
 }	
 
 function handleEvent(event) {
 	const step = 0.05;
 
-    if (event.key === "ArrowRight") {
-      programInfo.viewData.x += step
-    }
-    if (event.key === "ArrowLeft") {
-      programInfo.viewData.x -= step
-    }
-    if (event.key === "ArrowUp") {
-      programInfo.viewData.y += step
-    }
-    if (event.key === "ArrowDown") {
-      programInfo.viewData.y -= step
-    }
-    if (event.key === "=") {
-      programInfo.viewData.scale += step
-    }
-    if (event.key === "-") {
-      programInfo.viewData.scale -= step
-    }
-    
+		if (event.key === "ArrowRight") {
+			programInfo.viewData.x += step
+		}
+		if (event.key === "ArrowLeft") {
+			programInfo.viewData.x -= step
+		}
+		if (event.key === "ArrowUp") {
+			programInfo.viewData.y += step
+		}
+		if (event.key === "ArrowDown") {
+			programInfo.viewData.y -= step
+		}
+		if (event.key === "=") {
+			programInfo.viewData.scale += step
+		}
+		if (event.key === "-") {
+			programInfo.viewData.scale -= step
+		}
+		
 
-    draw(programInfo);
+		draw(programInfo);
 
 }
 
 
 
+function drawObject(verticesArray) {
+	// draws a single object from an array of vertices
+	let gl = programInfo.gl;
+	bindAttribute(verticesArray, programInfo.attribLocations.vertexLoc, 2);
+	gl.drawArrays(gl.TRIANGLES, 0, verticesArray.length/2); // len/2 because 2D
+}
 
-
-
-
-
-
-
-
-
+function bindAttribute(data, attributeLocation, size) {
+	// binds an attribute to a new buffer
+	// access with attribute location
+	let gl = programInfo.gl;
+	const buffer = gl.createBuffer();
+	gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+	gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
+	gl.enableVertexAttribArray(attributeLocation);
+	gl.vertexAttribPointer(attributeLocation, size, gl.FLOAT, false, 0, 0);
+}
 
 
 function draw(programInfo) {
@@ -245,32 +249,12 @@ function draw(programInfo) {
 	// clear previous frame
 	gl.clear(gl.COLOR_BUFFER_BIT);
 
-
-	gl.useProgram(program);
-	gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-	gl.enableVertexAttribArray(programInfo.vertexLoc);
-
-
-	// Tell the position attribute how to get data out of positionBuffer (ARRAY_BUFFER)
-    var size = 2;          // 2 components per iteration
-    var type = gl.FLOAT;   // the data is 32bit floats
-    var normalize = false; // don't normalize the data
-    var stride = 0;        // 0 = move forward size * sizeof(type) each iteration to get the next position
-    var offset = 0;        // start at the beginning of the buffer
-    gl.vertexAttribPointer(programInfo.vertexLoc, size, type, normalize, stride, offset);
-
-    // update camera
+		// update camera
 	gl.uniform2f(programInfo.uniformLocations.viewLoc, programInfo.viewData.x, programInfo.viewData.y);
 	gl.uniform1f(programInfo.uniformLocations.zoomLoc, programInfo.viewData.scale);
 
 	// Draw the geometry.
-	let currentGeometry = programInfo.geometry.tri;
-	bindVertices(currentGeometry, gl);
-		//
-    var primitiveType = gl.TRIANGLES;
-    var offset = 0;
-    var count = programInfo.geometry.tri.length / size;
-    gl.drawArrays(primitiveType, offset, count);
+	drawObject(programInfo.geometry.tri);
 }
 
 
