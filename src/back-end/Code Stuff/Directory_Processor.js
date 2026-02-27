@@ -2,8 +2,26 @@ const fs = require("fs");
 const path = require("path");
 const { spawn } = require("child_process");
 
+// DEBUG_MODE: "debug" | "minimal" | "none"
+// - "debug": Shows all logs including raw Python output and parsing details
+// - "minimal": Shows only the final output provided to the frontend
+// - "none": No console output
+const DEBUG_MODE = "debug";
+
 const CSV_PATH = path.join(__dirname, "Database", "campusBuilding_longlat.csv");
 const PYTHON_SCRIPT = path.join(__dirname, "..", "A_Star.py");
+
+// Helper function for conditional logging
+function log(message, level = "minimal") {
+	if (DEBUG_MODE === "none") return;
+	if (DEBUG_MODE === "minimal" && level === "debug") return;
+	console.log(message);
+}
+
+function logError(message) {
+	if (DEBUG_MODE === "none") return;
+	console.error(message);
+}
 
 function normalizeName(raw) {
 	if (!raw) return "";
@@ -155,11 +173,9 @@ function parsePythonOutput(output) {
 	let totalCost = null;
 	
 	// Debug: log the raw output
-	if (process.env.DEBUG) {
-		console.log("=== RAW PYTHON OUTPUT ===");
-		console.log(output);
-		console.log("=== END RAW OUTPUT ===\n");
-	}
+	log("=== RAW PYTHON OUTPUT ===", "debug");
+	log(output, "debug");
+	log("=== END RAW OUTPUT ===\n", "debug");
 	
 	for (const line of lines) {
 		// Look for "A* Path: ['Building1', 'Building2', ...]"
@@ -172,19 +188,14 @@ function parsePythonOutput(output) {
 				.map(item => item.trim().replace(/^['"]|['"]$/g, ""))
 				.filter(Boolean);
 			
-			if (process.env.DEBUG) {
-				console.log(`Parsed path: ${JSON.stringify(path)}`);
-			}
+			log(`Parsed path: ${JSON.stringify(path)}`, "debug");
 		}
 		
 		// Look for "Total Cost: <number>"
 		const costMatch = line.match(/Total\s+Cost:\s*(\d+\.?\d*)/);
 		if (costMatch) {
 			totalCost = parseFloat(costMatch[1]);
-			
-			if (process.env.DEBUG) {
-				console.log(`Parsed totalCost: ${totalCost}`);
-			}
+			log(`Parsed totalCost: ${totalCost}`, "debug");
 		}
 	}
 	
@@ -192,9 +203,7 @@ function parsePythonOutput(output) {
 		throw new Error("Could not find path in Python output");
 	}
 	
-	if (process.env.DEBUG) {
-		console.log(`\nFinal parsed result: path=${JSON.stringify(path)}, totalCost=${totalCost}\n`);
-	}
+	log(`\nFinal parsed result: path=${JSON.stringify(path)}, totalCost=${totalCost}\n`, "debug");
 	
 	return { path, totalCost };
 }
@@ -238,18 +247,19 @@ if (require.main === module) {
 	const args = process.argv.slice(2);
 	
 	if (args.length < 1) {
-		console.log("Usage: node Directory_Processor.js START_BUILDING [GOAL_BUILDING]");
-		console.log("");
-		console.log("Examples:");
-		console.log('  node Directory_Processor.js CTW Armstrong');
-		console.log('  node Directory_Processor.js "Mens Hall" CTW');
-		console.log('  node Directory_Processor.js "Student Affairs" "Nester North"');
-		console.log("");
-		console.log("Note: Use quotes around building names with spaces");
-		console.log("");
-		console.log("WARNING: A_Star.py currently runs a hardcoded test (CTW to Nester North)");
-		console.log("and does not accept command line arguments. To use custom start/goal,");
-		console.log("A_Star.py needs to be modified to accept sys.argv arguments.");
+		log("Usage: node Directory_Processor.js START_BUILDING [GOAL_BUILDING]");
+		log("");
+		log("Examples:");
+		log('  node Directory_Processor.js CTW Armstrong');
+		log('  node Directory_Processor.js "Mens Hall" CTW');
+		log('  node Directory_Processor.js "Student Affairs" "Nester North"');
+		log("");
+		log("Note: Use quotes around building names with spaces");
+		log("");
+		log("To change debug output, edit DEBUG_MODE at the top of this file:");
+		log('  - "debug": Shows all logs including raw Python output');
+		log('  - "minimal": Shows only the final frontend output (default)');
+		log('  - "none": No console output');
 		process.exit(1);
 	}
 	
@@ -257,7 +267,7 @@ if (require.main === module) {
 	let start, goal;
 	
 	if (args.length === 1) {
-		console.log("Error: Please provide both start and goal buildings");
+		logError("Error: Please provide both start and goal buildings");
 		process.exit(1);
 	} else if (args.length === 2) {
 		[start, goal] = args;
@@ -266,20 +276,20 @@ if (require.main === module) {
 		// Assume last argument is goal, everything else is start
 		goal = args[args.length - 1];
 		start = args.slice(0, -1).join(" ");
-		console.log(`Note: Interpreted as start="${start}", goal="${goal}"`);
-		console.log("Tip: Use quotes to avoid ambiguity\n");
+		log(`Note: Interpreted as start="${start}", goal="${goal}"`, "debug");
+		log("Tip: Use quotes to avoid ambiguity\n", "debug");
 	}
 	
-	console.log(`Requesting path from "${start}" to "${goal}"...\n`);
+	log(`Requesting path from "${start}" to "${goal}"...\n`, "debug");
 	
 	getPathJsonForFrontend(start, goal)
 		.then((json) => {
-			console.log("=== PATH RESULT FOR FRONTEND ===");
-			console.log(json);
+			log("=== PATH RESULT FOR FRONTEND ===");
+			log(json);
 		})
 		.catch((error) => {
-			console.error("\n=== ERROR ===");
-			console.error(error.message);
+			logError("\n=== ERROR ===");
+			logError(error.message);
 			process.exit(1);
 		});
 }
