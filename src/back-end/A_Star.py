@@ -16,12 +16,12 @@ class Node:
         self.backtrack = None
 
     # Adds an edge to the edge list
-    def addEdge(self, _e) -> None:
+    def addEdge(self, _e):
         self.edges.append(_e)
 
     # Allows node to track path
-    def setBacktrack(self, _n) -> None:
-        self.backTrack = _n
+    def setBacktrack(self, _n):
+        self.backtrack = _n
 
     # Returns nodes in the path
     def getBacktrack(self):
@@ -65,9 +65,19 @@ class Graph:
         e.connectNodes(_n1, _n2)
         self._edges.append(e)
 
-    # Calculates heuristic using Euclidean Distance
-    def calcHeuristic(self, _n1: Node, _n2: Node) -> float:
-        return math.sqrt((_n1.latitude - _n2.latitude) ** 2 + (_n1.longitude -_n2.longitude) ** 2)
+    # Calculates heuristic
+    def calcHeuristic(self, a, b):
+        R_feet = 20925524.9 # Earth's radius in feet
+
+        lat1 = math.radians(a.latitude)
+        lat2 = math.radians(b.latitude)
+        lon1 = math.radians(a.longitude)
+        lon2 = math.radians(b.longitude)
+
+        x = (lon2 - lon1) * math.cos((lat1 + lat2) / 2)
+        y = lat2 -lat1
+
+        return math.sqrt(x * x + y * y) * R_feet
     
     # A* Algorithm
     def a_star(self, start: Node, goal: Node):
@@ -95,8 +105,9 @@ class Graph:
                     print(f"Adding {current.name} to path")
                     path.append(current.name)
                     current = current.getBacktrack() # Sets current to previous node from the goal
-                    print(f"\nTotal Cost: {total_cost}")
-                    return path[::-1] # Returns reversed path for correct order of nodes
+
+                print(f"\nTotal Cost: {total_cost}")
+                return path[::-1] # Returns reversed path for correct order of nodes
                 
             for edge in current.edges:
                 neighbor = edge.getOther(current)
@@ -109,6 +120,7 @@ class Graph:
                     print(f"\nCalculating Heurisitc for {neighbor.name}")
                     neighbor.h = self.calcHeuristic(neighbor, goal)
                     neighbor.f = neighbor.g + neighbor.h # Sum of heuristic value and g cost
+                    neighbor.setBacktrack(current)
 
                     if neighbor in queue:
                         queue.remove(neighbor)
@@ -293,18 +305,18 @@ def test():
     # Connect nodes together
     x.addConnection(CTW, sn6, 82.92)
     x.addConnection(CTE, sn8, 68.31)
-    x.addConnection(sn6, Union, 189.56)
+    x.addConnection(sn6, Union, 189.56) # Northern Union Entrance
     x.addConnection(sn6, sn8, 200)
     x.addConnection(sn8, sn14, 99.58)
     x.addConnection(sn14, sn16, 132.17)
-    x.addConnection(sn16, Union, 338.08)
+    x.addConnection(sn16, Union, 338.08) # Northern Union Entrance
     x.addConnection(sn16, sn19, 149.43)
     x.addConnection(sn19, sn80, 157.49)
     x.addConnection(sn19, sn20, 58.11)
     x.addConnection(sn30, sn44, 166.5)
     x.addConnection(sn44, sn49, 115.47)
     x.addConnection(sn49, sn45, 66.33)
-    x.addConnection(sn45, NesterNorth, 1)
+    x.addConnection(sn45, NesterNorth, 1) # Souther Nester North Entrance
     x.addConnection(sn50, sn67, 39.82)
     x.addConnection(sn67, sn120, 181.36)
     x.addConnection(sn30, sn29, 53.92)
@@ -312,11 +324,11 @@ def test():
     x.addConnection(sn29, sn28, 47.97)
     x.addConnection(sn28, sn27, 37.28)
     x.addConnection(sn27, sn31, 45.42)
-    x.addConnection(sn31, NesterNorth, 1)
+    x.addConnection(sn31, NesterNorth, 1) # Norther Nester North Entrance
     x.addConnection(sn31, sn43, 45.42)
     x.addConnection(sn44, sn54, 68.82)
     x.addConnection(sn54, sn52, 67.74)
-    x.addConnection(sn52, Antelope, 1)
+    x.addConnection(sn52, Antelope, 1) # Southern Antelope Entrance
     x.addConnection(sn52, sn53, 75.54)
     x.addConnection(sn53, sn65, 70.93)
     x.addConnection(sn80, sn78, 52.37)
@@ -333,10 +345,33 @@ def test():
     x.addConnection(sn181, Mens, 70)
     x.addConnection(sn181, sn188, 223.3)
     x.addConnection(sn188, sn194, 42.76)
-    x.addConnection(sn194, MantorRandall, 1)
+    x.addConnection(sn194, MantorRandall, 1) # Mantor/Randall Entrance
+    x.addConnection(sn66, sn170, 60.18)
+    x.addConnection(sn170, sn166, 138.05)
+    x.addConnection(sn166, sn124, 105.81)
+    x.addConnection(sn124, sn123, 32.13)
+    x.addConnection(sn123, Copeland, 1)
+    x.addConnection(sn124, sn125, 23.86)
+    x.addConnection(sn125, sn163, 151.15)
+    x.addConnection(sn163, sn168, 122.6)
+    x.addConnection(sn168, Library, 10) # East Library Entrance
+    x.addConnection(sn168,sn166, 168.16)
+    x.addConnection(sn168, sn169, 135.8)
+    x.addConnection(sn169, sn162, 124.12)
+    x.addConnection(sn162, Bruner, 5) # North Bruner Entrance
+    x.addConnection(sn162, sn163, 165.9)
+    x.addConnection(sn44, sn50, 37.74)
+    x.addConnection(sn50, sn58, 115.47)
+    x.addConnection(sn58, sn68, 66.33)
+    x.addConnection(sn68, NesterSouth, 1) # Nester South North Entrance
+    x.addConnection(sn120, sn113, 104.4)
+    x.addConnection(sn120, sn124, 132.06)
+    x.addConnection(sn113, sn108, 136.87)
+    x.addConnection(sn108, NesterSouth, 10) # Nester South South Entrance
+
 
     # Calculates A* based on specified nodes (start, end)
-    s1 = x.a_star(CTW, MantorRandall)
+    s1 = x.a_star(MantorRandall, Bruner)
     print(f"\nA* Path: {s1}\n")
 
 if __name__ == "__main__":
