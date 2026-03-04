@@ -102,6 +102,10 @@ function main() {
 		-1.0, -1.0,
 		-0.9, -0.9,
 		-0.9, -1.0,
+
+		-1.5, -1.5,
+		-1.9, -1.9,
+		-1.9, -1.5,
 	]);
 
 	// buffer setup
@@ -211,14 +215,13 @@ function handleEvent(event) {
 			programInfo.viewData.scale -= step
 		}
 		
-
 		draw(programInfo);
 
 }
 
 
 
-function drawObject(verticesArray) {
+function drawTrianglesObject(verticesArray) {
 	// draws a single object from an array of vertices
 	let gl = programInfo.gl;
 	bindAttribute(verticesArray, programInfo.attribLocations.vertexLoc, 2);
@@ -235,6 +238,132 @@ function bindAttribute(data, attributeLocation, size) {
 	gl.enableVertexAttribArray(attributeLocation);
 	gl.vertexAttribPointer(attributeLocation, size, gl.FLOAT, false, 0, 0);
 }
+
+
+
+
+
+
+
+
+
+function constructLatLongPath(pathJSON) {
+	// convert JSON path retrieved from directory processor to lat,long tuples for use in tracePath()
+
+	// currently, it only constructs a static test array
+	const path = new Float32Array([
+		0.5,0.5,
+		0.9,0.9,
+	]);
+
+	// make a triangle for every point
+	const verticesFromPath = new Float32Array((path.length * 3)); // three vertices per point
+	let pathVerticeIndex = 0;
+
+	let delta = {
+		x:0,
+		y:0,
+	};
+	let previousPoint = null;
+	let currentPoint;
+	let newTriangleA;
+	let newTriangleB;
+
+	for (var i = 0; i < path.length; i+=2) {
+		currentPoint = {
+			x:path[i],
+			y:path[i+1],
+		};
+
+		if (previousPoint == null) {
+			previousPoint = currentPoint;
+			i += 2;
+			currentPoint = {
+				x:path[i],
+				y:path[i+1],
+			};
+		}
+
+		console.log(currentPoint);
+		
+		// length
+		var lineLength = Math.sqrt((currentPoint.x - previousPoint.x)**2 + (currentPoint.y - previousPoint.y)**2);
+
+
+		var directionFromUp
+
+		// determine direction of path
+		if (currentPoint) {
+			// heading
+			// get x y delta
+			// 
+				//north (deltaY = 1)
+
+				//south (deltaY = -1)
+			
+				//east (deltaX = 1)
+			
+				//west (deltaY = -1)
+		} else {
+
+		}
+
+		// two triangles per point pair
+		newTriangleA = []; // three 2d vertices
+		newTriangleB = []; // three 2d vertices
+
+		// above point
+		newTriangleA.push(currentPoint.x);
+		newTriangleA.push(currentPoint.y+0.05);
+		// left bottom
+		newTriangleA.push(currentPoint.x-0.05);
+		newTriangleA.push(currentPoint.y-0.05);
+		// right bottom
+		newTriangleA.push(currentPoint.x+0.05);
+		newTriangleA.push(currentPoint.y-0.05);
+		
+
+		// above point
+		newTriangleB.push(previousPoint.x);
+		newTriangleB.push(previousPoint.y+0.05);
+		// left bottom
+		newTriangleB.push(previousPoint.x-0.05);
+		newTriangleB.push(previousPoint.y-0.05);
+		// right bottom
+		newTriangleB.push(previousPoint.x+0.05);
+		newTriangleB.push(previousPoint.y-0.05);
+		
+
+		newTriangleA.forEach( (element) => {
+			verticesFromPath[pathVerticeIndex] = element;
+			pathVerticeIndex++;
+		});
+		newTriangleB.forEach( (element) => {
+			verticesFromPath[pathVerticeIndex] = element;
+			pathVerticeIndex++;
+		});
+
+		console.log(newTriangleA);
+		console.log(newTriangleB);
+
+
+		previousPoint = currentPoint;
+	}
+
+	return verticesFromPath;
+}
+
+
+
+// function tracePath(pathJSON) {
+// 	// take path=[[lat,long],...,[lat,long]] -> draw lines between locations
+// 	let gl = programInfo.gl;
+// 	const pathVertices = constructLatLongPath(null);
+// 	bindAttribute(pathVertices, programInfo.attribLocations.vertexLoc, 2);
+// 	gl.lineWidth(4.0);
+// 	gl.drawArrays(gl.LINE_ARRAY, pathVertices, pathVertices.length/2);
+// 	console.log("path drawn!")
+// }
 
 
 function draw(programInfo) {
@@ -254,7 +383,13 @@ function draw(programInfo) {
 	gl.uniform1f(programInfo.uniformLocations.zoomLoc, programInfo.viewData.scale);
 
 	// Draw the geometry.
-	drawObject(programInfo.geometry.tri);
+	drawTrianglesObject(programInfo.geometry.tri);
+
+	let p = constructLatLongPath(null);
+	console.log(p);
+	drawTrianglesObject(p);
+
+	// tracePath(null);
 }
 
 
