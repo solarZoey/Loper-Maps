@@ -253,9 +253,6 @@ function drawTriangleFanObject(verticesArray) {
 	gl.drawArrays(gl.TRIANGLE_FAN, 0, verticesArray.length/2); // len/2 because 2D
 }
 
-
-
-
 function constructCircle(radius, center, resolution) {
 	// radius => float
 	// center => [xFloat, yFloat]
@@ -272,8 +269,6 @@ function constructCircle(radius, center, resolution) {
 	vertices.push(center.x);
 	vertices.push(center.y);
 
-	// let prevPoint = []; // drawing needs three vertices per triangle: center, previous circ, next circ
-
 	// add cicumference vertices
 	let angle;
 	let newX;
@@ -285,29 +280,18 @@ function constructCircle(radius, center, resolution) {
 		newX = center.x + radius * Math.cos(angle);
 		newY = center.y + radius * Math.sin(angle);
 
-		// // add center
-		// vertices.push(center[0]);
-		// vertices.push(center[1]);
-		// // add previous
-		// vertices.push(prevPoint[0]);
-		// vertices.push(prevPoint[1]);
-
 		// add new
 		vertices.push(newX);
 		vertices.push(newY);
 
 		if (!first) {
+			// record first generated vertex for duplication later
 			first = [newX, newY];
 		}
-		// // update previous for next iteration
-		// prevPoint = [newX, newY];
 	}
 	// duplicate first vertex
 	vertices.push(first[0]);
 	vertices.push(first[1]);
-
-	console.log("circle!");
-	console.log(vertices)
 
 	// convert vertex array to Float32Array
 	let output = new Float32Array(vertices.length);
@@ -321,8 +305,7 @@ function constructCircle(radius, center, resolution) {
 }
 
 function constructLatLongPath(pathJSON) {
-	// convert JSON path retrieved from directory processor to lat,long tuples for use in tracePath()
-
+	// TODO convert JSON path retrieved from directory processor to lat,long tuples for use in tracePath()
 	// currently, it only constructs a static test array
 	const path = new Float32Array([
 		0.5,0.5,
@@ -362,8 +345,8 @@ function constructLatLongPath(pathJSON) {
 		// length
 		var lineLength = Math.sqrt((currentPoint.x - previousPoint.x)**2 + (currentPoint.y - previousPoint.y)**2);
 
-		// TODO
 		// determine direction of path
+		// TODO
 		var directionFromNorth;
 		if (currentPoint) {
 			// heading
@@ -424,8 +407,6 @@ function constructLatLongPath(pathJSON) {
 	return verticesFromPath;
 }
 
-
-
 // function tracePath(pathJSON) {
 // 	// take path=[[lat,long],...,[lat,long]] -> draw lines between locations
 // 	let gl = programInfo.gl;
@@ -461,7 +442,6 @@ function draw(programInfo) {
 	console.log(p);
 	drawTrianglesObject(p);
 
-	// tracePath(null);
 }
 
 
