@@ -4,17 +4,7 @@ Date of creation: 2026-02-18
 Directive:
 	generates and displays graphics to the #gl_canvas canvas element
 */
-// as it stands, most of this is taken from MDN (https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Tutorial/Adding_2D_content_to_a_WebGL_context)
-
-// wait half a second for html elements to load before starting graphics
-console.log("waiting...")
-setTimeout(function() {
-	console.log("woaw!!!")
-	main();
-}, 500);
-
-// event listeners
-document.addEventListener("keydown", handleEvent);
+// a few functions herein are taken from MDN (https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Tutorial/Adding_2D_content_to_a_WebGL_context)
 
 // global declaration
 const programInfo = {
@@ -39,6 +29,16 @@ const programInfo = {
 		},
 		gl: null,
 	};
+
+// event listeners
+document.addEventListener("keydown", handleEvent);
+
+// wait half a second for html elements to load before starting graphics
+console.log("waiting...")
+setTimeout(function() {
+	console.log("woaw!!!")
+	main();
+}, 500);
 
 function main() {
 	console.log("graphics running...")
@@ -107,6 +107,7 @@ function main() {
 		-1.9, -1.9,
 		-1.9, -1.5,
 	]);
+
 
 	// buffer setup
 	const vertexBuffer = gl.createBuffer();
@@ -194,38 +195,37 @@ function resizeCanvasToDisplaySize(canvas) {
 }	
 
 function handleEvent(event) {
+	let needDraw = false;
 	const step = 0.05;
 
-		if (event.key === "ArrowRight") {
-			programInfo.viewData.x += step
-		}
-		if (event.key === "ArrowLeft") {
-			programInfo.viewData.x -= step
-		}
-		if (event.key === "ArrowUp") {
-			programInfo.viewData.y += step
-		}
-		if (event.key === "ArrowDown") {
-			programInfo.viewData.y -= step
-		}
-		if (event.key === "=") {
-			programInfo.viewData.scale += step
-		}
-		if (event.key === "-") {
-			programInfo.viewData.scale -= step
-		}
-		
+	if (event.key === "ArrowRight") {
+		programInfo.viewData.x += step;
+		needDraw = true;
+	}
+	if (event.key === "ArrowLeft") {
+		programInfo.viewData.x -= step;
+		needDraw = true;
+	}
+	if (event.key === "ArrowUp") {
+		programInfo.viewData.y += step;
+		needDraw = true;
+	}
+	if (event.key === "ArrowDown") {
+		programInfo.viewData.y -= step;
+		needDraw = true;
+	}
+	if (event.key === "=") {
+		programInfo.viewData.scale += step;
+		needDraw = true;
+	}
+	if (event.key === "-") {
+		programInfo.viewData.scale -= step;
+		needDraw = true;
+	}
+
+	if (needDraw) {
 		draw(programInfo);
-
-}
-
-
-
-function drawTrianglesObject(verticesArray) {
-	// draws a single object from an array of vertices
-	let gl = programInfo.gl;
-	bindAttribute(verticesArray, programInfo.attribLocations.vertexLoc, 2);
-	gl.drawArrays(gl.TRIANGLES, 0, verticesArray.length/2); // len/2 because 2D
+	}
 }
 
 function bindAttribute(data, attributeLocation, size) {
@@ -239,13 +239,86 @@ function bindAttribute(data, attributeLocation, size) {
 	gl.vertexAttribPointer(attributeLocation, size, gl.FLOAT, false, 0, 0);
 }
 
+function drawTrianglesObject(verticesArray) {
+	// draws a single object from an array of vertices
+	let gl = programInfo.gl;
+	bindAttribute(verticesArray, programInfo.attribLocations.vertexLoc, 2);
+	gl.drawArrays(gl.TRIANGLES, 0, verticesArray.length/2); // len/2 because 2D
+}
+
+function drawTriangleFanObject(verticesArray) {
+	// draws a single object from an array of vertices
+	let gl = programInfo.gl;
+	bindAttribute(verticesArray, programInfo.attribLocations.vertexLoc, 2);
+	gl.drawArrays(gl.TRIANGLE_FAN, 0, verticesArray.length/2); // len/2 because 2D
+}
 
 
 
 
+function constructCircle(radius, center, resolution) {
+	// radius => float
+	// center => [xFloat, yFloat]
+	// resolution => integer; number of circumference points
+	let gl = programInfo.gl;
 
+	let vertices = [];
 
+	center = {
+		x: center[0],
+		y: center[1],
+	};
+	// push center
+	vertices.push(center.x);
+	vertices.push(center.y);
 
+	// let prevPoint = []; // drawing needs three vertices per triangle: center, previous circ, next circ
+
+	// add cicumference vertices
+	let angle;
+	let newX;
+	let newY;
+	let first; // storing the first calculated vertex, needs to be copied at the end to complete the circle
+	for (let i = 0; i < resolution; i++) {
+
+		angle = ((2 * Math.PI) * (i / resolution)); // circle angles from 0 to 2PI
+		newX = center.x + radius * Math.cos(angle);
+		newY = center.y + radius * Math.sin(angle);
+
+		// // add center
+		// vertices.push(center[0]);
+		// vertices.push(center[1]);
+		// // add previous
+		// vertices.push(prevPoint[0]);
+		// vertices.push(prevPoint[1]);
+
+		// add new
+		vertices.push(newX);
+		vertices.push(newY);
+
+		if (!first) {
+			first = [newX, newY];
+		}
+		// // update previous for next iteration
+		// prevPoint = [newX, newY];
+	}
+	// duplicate first vertex
+	vertices.push(first[0]);
+	vertices.push(first[1]);
+
+	console.log("circle!");
+	console.log(vertices)
+
+	// convert vertex array to Float32Array
+	let output = new Float32Array(vertices.length);
+	let outI = 0;
+	vertices.forEach( (v) => {
+		output[outI] = v;
+		outI++;
+	});
+
+	return output;
+}
 
 function constructLatLongPath(pathJSON) {
 	// convert JSON path retrieved from directory processor to lat,long tuples for use in tracePath()
@@ -289,10 +362,9 @@ function constructLatLongPath(pathJSON) {
 		// length
 		var lineLength = Math.sqrt((currentPoint.x - previousPoint.x)**2 + (currentPoint.y - previousPoint.y)**2);
 
-
-		var directionFromUp
-
+		// TODO
 		// determine direction of path
+		var directionFromNorth;
 		if (currentPoint) {
 			// heading
 			// get x y delta
@@ -321,7 +393,6 @@ function constructLatLongPath(pathJSON) {
 		// right bottom
 		newTriangleA.push(currentPoint.x+0.05);
 		newTriangleA.push(currentPoint.y-0.05);
-		
 
 		// above point
 		newTriangleB.push(previousPoint.x);
@@ -384,6 +455,7 @@ function draw(programInfo) {
 
 	// Draw the geometry.
 	drawTrianglesObject(programInfo.geometry.tri);
+	drawTriangleFanObject(constructCircle(0.2,[-0.5,0.5],30));
 
 	let p = constructLatLongPath(null);
 	console.log(p);
