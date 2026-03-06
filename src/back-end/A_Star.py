@@ -34,7 +34,7 @@ class Edge:
         self.weight = cost
 
     # Connects two nodes and tells each node they are connected
-    def connectNodes(self, _n1: Node, _n2: Node) -> None:
+    def connectNodes(self, _n1: Node, _n2: Node):
         if len(self.connections) == 0:
             self.connections.append(_n1)
             self.connections.append(_n2)
@@ -350,7 +350,7 @@ def test():
     x.addConnection(sn170, sn166, 138.05)
     x.addConnection(sn166, sn124, 105.81)
     x.addConnection(sn124, sn123, 32.13)
-    x.addConnection(sn123, Copeland, 1)
+    x.addConnection(sn123, Copeland, 1) # Copeland South Entrance
     x.addConnection(sn124, sn125, 23.86)
     x.addConnection(sn125, sn163, 151.15)
     x.addConnection(sn163, sn168, 122.6)
@@ -363,15 +363,16 @@ def test():
     x.addConnection(sn44, sn50, 37.74)
     x.addConnection(sn50, sn58, 115.47)
     x.addConnection(sn58, sn68, 66.33)
-    x.addConnection(sn68, NesterSouth, 1) # Nester South North Entrance
+    x.addConnection(sn68, NesterSouth, 1) # Nester South, North Entrance
     x.addConnection(sn120, sn113, 104.4)
     x.addConnection(sn120, sn124, 132.06)
     x.addConnection(sn113, sn108, 136.87)
-    x.addConnection(sn108, NesterSouth, 10) # Nester South South Entrance
+    x.addConnection(sn108, NesterSouth, 10) # Nester South, South Entrance
+    x.addConnection(sn170, Copeland, 10) # Copeland East Entrance
 
 
     # Calculates A* based on specified nodes (start, end)
-    s1 = x.a_star(MantorRandall, Bruner)
+    s1 = x.a_star(CTW, Bruner)
     print(f"\nA* Path: {s1}\n")
 
 if __name__ == "__main__":
