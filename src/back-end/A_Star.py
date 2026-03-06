@@ -389,6 +389,8 @@ def test():
     s2 = x.a_star(start_node, goal_node)
     print((f"\nA* Path: {s2}\n"))
     """
+
+    # Errors are not handling correctly yet, just returning python exit
     try:
         start_building = sys.argv[1]
         goal_building = sys.argv[2]
