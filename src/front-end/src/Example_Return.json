@@ -1,0 +1,104 @@
+{
+  "nodes": [
+    {
+      "index": 0,
+      "name": "Mens",
+      "latitude": null,
+      "longitude": null,
+      "hasCoordinates": false
+    },
+    {
+      "index": 1,
+      "name": "sn182",
+      "latitude": null,
+      "longitude": null,
+      "hasCoordinates": false
+    },
+    {
+      "index": 2,
+      "name": "sn141",
+      "latitude": null,
+      "longitude": null,
+      "hasCoordinates": false
+    },
+    {
+      "index": 3,
+      "name": "sn65",
+      "latitude": null,
+      "longitude": null,
+      "hasCoordinates": false
+    },
+    {
+      "index": 4,
+      "name": "sn53",
+      "latitude": null,
+      "longitude": null,
+      "hasCoordinates": false
+    },
+    {
+      "index": 5,
+      "name": "sn52",
+      "latitude": null,
+      "longitude": null,
+      "hasCoordinates": false
+    },
+    {
+      "index": 6,
+      "name": "sn54",
+      "latitude": null,
+      "longitude": null,
+      "hasCoordinates": false
+    },
+    {
+      "index": 7,
+      "name": "sn44",
+      "latitude": null,
+      "longitude": null,
+      "hasCoordinates": false
+    },
+    {
+      "index": 8,
+      "name": "sn50",
+      "latitude": null,
+      "longitude": null,
+      "hasCoordinates": false
+    },
+    {
+      "index": 9,
+      "name": "sn58",
+      "latitude": null,
+      "longitude": null,
+      "hasCoordinates": false
+    },
+    {
+      "index": 10,
+      "name": "sn68",
+      "latitude": null,
+      "longitude": null,
+      "hasCoordinates": false
+    },
+    {
+      "index": 11,
+      "name": "Nester South",
+      "latitude": 40.701423,
+      "longitude": -99.094741,
+      "hasCoordinates": true
+    }
+  ],
+  "totalNodes": 12,
+  "nodesWithCoordinates": 1,
+  "totalCost": 766.1600000000002,
+  "missingCoordinates": [
+    "Mens",
+    "sn182",
+    "sn141",
+    "sn65",
+    "sn53",
+    "sn52",
+    "sn54",
+    "sn44",
+    "sn50",
+    "sn58",
+    "sn68"
+  ]
+}
