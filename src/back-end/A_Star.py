@@ -1,4 +1,5 @@
 import math
+import sys
 
 # Node Class representing each building on campus
 class Node:
@@ -372,7 +373,7 @@ def test():
 
 
     # Calculates A* based on specified nodes (start, end)
-    s1 = x.a_star(CTW, Bruner)
+    s1 = x.a_star(MantorRandall, Bruner)
     print(f"\nA* Path: {s1}\n")
 
 if __name__ == "__main__":

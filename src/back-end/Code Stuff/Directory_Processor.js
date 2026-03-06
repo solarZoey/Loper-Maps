@@ -2,6 +2,8 @@ const fs = require("fs");
 const path = require("path");
 const { spawn } = require("child_process");
 
+// Run: node .\Directory_Processor.js "Start" "End"
+
 // DEBUG_MODE: "debug" | "minimal" | "none"
 // - "debug": Shows all logs including raw Python output and parsing details
 // - "minimal": Shows only the final output provided to the frontend
@@ -143,8 +145,13 @@ function runPythonPathfinding(startBuilding, goalBuilding) {
 		});
 		
 		pythonProcess.on("close", (code) => {
+			if (stderr) {
+                logError("\n=== PYTHON STDERR ===");
+                logError(stderr);
+            }
+
 			if (code !== 0) {
-				reject(new Error(`Python script exited with code ${code}\n${stderr}`));
+				reject(new Error(`Python script exited with code ${code}`));
 				return;
 			}
 			
@@ -163,7 +170,7 @@ function runPythonPathfinding(startBuilding, goalBuilding) {
 }
 
 /**
- * Parses the output from A_Star.py to extract path and total cost
+ * Takes the output from A_Star.py to extract path and total cost
  * @param {string} output - Raw output from Python script
  * @returns {Object} - { path: string[], totalCost: number }
  */
