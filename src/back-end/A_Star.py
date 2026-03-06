@@ -376,5 +376,39 @@ def test():
     s1 = x.a_star(MantorRandall, Bruner)
     print(f"\nA* Path: {s1}\n")
 
+
+    # Christian's Playground
+    """
+    start_building = sys.argv[1]
+    goal_building = sys.argv[2]
+    node_dict = {node.name: node for node in x._nodes}
+    start_node = node_dict[start_building]
+    goal_node = node_dict[goal_building]
+    if not start_node or not goal_node:
+        print(f"Error: Building not found")
+        sys.exit(1)
+    s2 = x.a_star(start_node, goal_node)
+    print((f"\nA* Path: {s2}\n"))
+    """
+
+    # Errors are not handling correctly yet, just returning python exit
+    try:
+        start_building = sys.argv[1]
+        goal_building = sys.argv[2]
+                
+        # Create normalized lookup dictionary
+        node_dict = {node.name.replace(" ", "").lower(): node for node in x._nodes}
+                
+        # Normalize and get nodes
+        start_node = node_dict[start_building.replace(" ", "").lower()]
+        goal_node = node_dict[goal_building.replace(" ", "").lower()]
+                
+        s2 = x.a_star(start_node, goal_node)
+        print(f"\nA* Path: {s2}\n")
+        print(f"Total Cost: {goal_node.g}\n")
+    except KeyError:
+        print(f"Error: Building not found. Please check your input and try again.")
+        sys.exit(1)
+
 if __name__ == "__main__":
     test()
