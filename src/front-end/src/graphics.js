@@ -184,8 +184,8 @@ function resizeCanvasToDisplaySize(canvas) {
 		const displayHeight = canvas.clientHeight;
 
 		// Check if the canvas is not the same size.
-		const needResize = canvas.width  !== displayWidth ||
-											 canvas.height !== displayHeight;
+		const needResize = canvas.width !== displayWidth ||
+							canvas.height !== displayHeight;
 
 		if (needResize) {
 			// Make the canvas the same size
@@ -307,31 +307,40 @@ function constructCircle(radius, center, resolution) {
 function constructLatLongPath(pathJSON) {
 	// TODO convert JSON path retrieved from directory processor to lat,long tuples for use in tracePath()
 	// currently, it only constructs a static test array
+	
 	const path = new Float32Array([
-		0.5,0.5,
 		0.9,0.9,
+		0.3,0.3,
+		0.6,0.2,
+		0.1,-0.4,
+		-0.2,-0.5,
+		-0.2,-0.8,
+		0.0,-0.9,
 	]);
 
 	// make a triangle for every point
-	const verticesFromPath = new Float32Array((path.length * 3)); // three vertices per point
+	const verticesFromPath = new Float32Array((path.length * 5 + 6)); // a triangle per coordinate pair
 	let pathVerticeIndex = 0;
-
 	let delta = {
 		x:0,
 		y:0,
 	};
 	let previousPoint = null;
 	let currentPoint;
-	let newTriangleA;
-	let newTriangleB;
+	let sideA;
+	let sideB;
 
 	for (var i = 0; i < path.length; i+=2) {
+		// create vertices for a rectangle for each line (set of two points)
+		console.log("i",i)
+
 		currentPoint = {
 			x:path[i],
 			y:path[i+1],
 		};
 
 		if (previousPoint == null) {
+			// handle first line
 			previousPoint = currentPoint;
 			i += 2;
 			currentPoint = {
@@ -340,18 +349,25 @@ function constructLatLongPath(pathJSON) {
 			};
 		}
 
-		console.log(currentPoint);
+		console.log("current point: ",currentPoint);
+		// now we have two points for a line, (currentPoint, previousPoint)
 		
-		// length
-		var lineLength = Math.sqrt((currentPoint.x - previousPoint.x)**2 + (currentPoint.y - previousPoint.y)**2);
-
+		/* TODO
 		// determine direction of path
-		// TODO
-		var directionFromNorth;
+		// ensure width of path does not change
+
+		var angleFromNorth;
+		var lineMagnitude = Math.sqrt(delta.x**2 + delta.y**2);
+		delta = {
+			x: Math.abs(currentPoint.x - previousPoint.x),
+			y: Math.abs(currentPoint.y - previousPoint.y),
+		};
+
 		if (currentPoint) {
 			// heading
-			// get x y delta
-			// 
+
+			// angleFromNorth = Math.atan()
+
 				//north (deltaY = 1)
 
 				//south (deltaY = -1)
@@ -362,43 +378,34 @@ function constructLatLongPath(pathJSON) {
 		} else {
 
 		}
+		*/
 
 		// two triangles per point pair
-		newTriangleA = []; // three 2d vertices
-		newTriangleB = []; // three 2d vertices
+		sideA = []; // three 2d vertices
+		sideB = []; // three 2d vertices
 
-		// above point
-		newTriangleA.push(currentPoint.x);
-		newTriangleA.push(currentPoint.y+0.05);
-		// left bottom
-		newTriangleA.push(currentPoint.x-0.05);
-		newTriangleA.push(currentPoint.y-0.05);
-		// right bottom
-		newTriangleA.push(currentPoint.x+0.05);
-		newTriangleA.push(currentPoint.y-0.05);
+		sideA.push(previousPoint.x+0.05);
+		sideA.push(previousPoint.y);
+		sideA.push(previousPoint.x-0.05);
+		sideA.push(previousPoint.y);
+		sideA.push(currentPoint.x-0.05);
+		sideA.push(currentPoint.y);
 
-		// above point
-		newTriangleB.push(previousPoint.x);
-		newTriangleB.push(previousPoint.y+0.05);
-		// left bottom
-		newTriangleB.push(previousPoint.x-0.05);
-		newTriangleB.push(previousPoint.y-0.05);
-		// right bottom
-		newTriangleB.push(previousPoint.x+0.05);
-		newTriangleB.push(previousPoint.y-0.05);
-		
+		sideB.push(currentPoint.x-0.05);
+		sideB.push(currentPoint.y);
+		sideB.push(currentPoint.x+0.05);
+		sideB.push(currentPoint.y);
+		sideB.push(previousPoint.x+0.05);
+		sideB.push(previousPoint.y);
 
-		newTriangleA.forEach( (element) => {
+		sideA.forEach( (element) => {
 			verticesFromPath[pathVerticeIndex] = element;
 			pathVerticeIndex++;
 		});
-		newTriangleB.forEach( (element) => {
+		sideB.forEach( (element) => {
 			verticesFromPath[pathVerticeIndex] = element;
 			pathVerticeIndex++;
 		});
-
-		console.log(newTriangleA);
-		console.log(newTriangleB);
 
 
 		previousPoint = currentPoint;
@@ -406,17 +413,6 @@ function constructLatLongPath(pathJSON) {
 
 	return verticesFromPath;
 }
-
-// function tracePath(pathJSON) {
-// 	// take path=[[lat,long],...,[lat,long]] -> draw lines between locations
-// 	let gl = programInfo.gl;
-// 	const pathVertices = constructLatLongPath(null);
-// 	bindAttribute(pathVertices, programInfo.attribLocations.vertexLoc, 2);
-// 	gl.lineWidth(4.0);
-// 	gl.drawArrays(gl.LINE_ARRAY, pathVertices, pathVertices.length/2);
-// 	console.log("path drawn!")
-// }
-
 
 function draw(programInfo) {
 	let program = programInfo.program;
@@ -435,12 +431,13 @@ function draw(programInfo) {
 	gl.uniform1f(programInfo.uniformLocations.zoomLoc, programInfo.viewData.scale);
 
 	// Draw the geometry.
-	drawTrianglesObject(programInfo.geometry.tri);
+	// circle
 	drawTriangleFanObject(constructCircle(0.2,[-0.5,0.5],30));
-
-	let p = constructLatLongPath(null);
-	console.log(p);
-	drawTrianglesObject(p);
+	// path
+		// TODO refactor target: make 'pathGeo' a programInfo attribute, set to null when not displaying
+	let pathGeo = constructLatLongPath(null);
+	console.log(pathGeo);
+	drawTrianglesObject(pathGeo);
 
 }
 
