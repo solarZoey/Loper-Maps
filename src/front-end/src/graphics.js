@@ -3,8 +3,9 @@ Author: Nova Solarz (it/they/she)
 Date of creation: 2026-02-18
 Directive:
 	generates and displays graphics to the #gl_canvas canvas element
+Notes:
+	 a few functions herein are taken from MDN (https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Tutorial/Adding_2D_content_to_a_WebGL_context)
 */
-// a few functions herein are taken from MDN (https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Tutorial/Adding_2D_content_to_a_WebGL_context)
 
 // global declaration
 const programInfo = {
@@ -19,8 +20,9 @@ const programInfo = {
 			vertexB: null,
 		},
 		geometry: {
-			tri: null,
-			sqr: null,		
+			tri: null, // demo triangles
+			sqr: null,	// demo square
+			path: null,	
 		},
 		viewData: {
 			x: 0.0,
@@ -113,7 +115,7 @@ function main() {
 	const vertexBuffer = gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
 
-	// filling out programInfo
+	// populate programInfo fields
 	programInfo.program = shaderProgram;
 	programInfo.attribLocations.vertexLoc = gl.getAttribLocation(shaderProgram, "aVertexPosition");
 	programInfo.uniformLocations.viewLoc = gl.getUniformLocation(shaderProgram, "uViewOffset");
@@ -307,7 +309,7 @@ function constructCircle(radius, center, resolution) {
 function constructLatLongPath(pathJSON) {
 	// TODO convert JSON path retrieved from directory processor to lat,long tuples for use in tracePath()
 	// currently, it only constructs a static test array
-	
+
 	const path = new Float32Array([
 		0.9,0.9,
 		0.3,0.3,
@@ -316,6 +318,7 @@ function constructLatLongPath(pathJSON) {
 		-0.2,-0.5,
 		-0.2,-0.8,
 		0.0,-0.9,
+		-1.0,-0.6,
 	]);
 
 	// make a triangle for every point
@@ -342,7 +345,7 @@ function constructLatLongPath(pathJSON) {
 		if (previousPoint == null) {
 			// handle first line
 			previousPoint = currentPoint;
-			i += 2;
+			i+=2;
 			currentPoint = {
 				x:path[i],
 				y:path[i+1],
@@ -350,60 +353,69 @@ function constructLatLongPath(pathJSON) {
 		}
 
 		console.log("current point: ",currentPoint);
+		console.log("previous point: ",previousPoint);
 		// now we have two points for a line, (currentPoint, previousPoint)
 		
-		/* TODO
-		// determine direction of path
-		// ensure width of path does not change
-
-		var angleFromNorth;
-		var lineMagnitude = Math.sqrt(delta.x**2 + delta.y**2);
-		delta = {
-			x: Math.abs(currentPoint.x - previousPoint.x),
-			y: Math.abs(currentPoint.y - previousPoint.y),
-		};
-
-		if (currentPoint) {
-			// heading
-
-			// angleFromNorth = Math.atan()
-
-				//north (deltaY = 1)
-
-				//south (deltaY = -1)
-			
-				//east (deltaX = 1)
-			
-				//west (deltaY = -1)
-		} else {
-
-		}
-		*/
-
 		// two triangles per point pair
 		sideA = []; // three 2d vertices
 		sideB = []; // three 2d vertices
+		let pathWidth = 0.05;
+		let delta = { // 
+			x: null,
+			y: null,
+		};
 
-		sideA.push(previousPoint.x+0.05);
-		sideA.push(previousPoint.y);
-		sideA.push(previousPoint.x-0.05);
-		sideA.push(previousPoint.y);
-		sideA.push(currentPoint.x-0.05);
-		sideA.push(currentPoint.y);
+		let angle = Math.atan(delta.x / delta.y); 
+		let magnitude = Math.sqrt(delta.x**2 + delta.y**2); // magnitude to construct a north vector
+		let rotVector; //	vector (x,y) currently being rotated from North, centered at origin
+		let rotationMatrix = [
+			[Math.cos(angle), -Math.sin(angle)],
+			[Math.sin(angle), Math.cos(angle)],
+		]
+		// rotate each vertex around point
+		// determine direction of path
+		// ensure width of path does not change
+		
+		// sideA vertex transformations - centered on previous point
+		sideA.forEach( (point) => {
+			delta.x = abs(point[0] - point[1]); // okay spring break happened and I have no idea what I was trying to do here ;-;
+			delta.y = 
+			angle = Math.atan(delta.x / delta.y);
+			magnitude = Math.sqrt(delta.x**2 + delta.y**2);
+			rotVector = [0, magnitude];
+			// matrix multiply rotationMatrix × rotVector
+		});
 
-		sideB.push(currentPoint.x-0.05);
-		sideB.push(currentPoint.y);
-		sideB.push(currentPoint.x+0.05);
-		sideB.push(currentPoint.y);
-		sideB.push(previousPoint.x+0.05);
-		sideB.push(previousPoint.y);
+		// sideB vertex transformations - centered on current point
+		sideB.forEach( (point) => {
+			
+		});
 
+
+/* temporary static non-rotated vertices
+		sideA.push([previousPoint.x + pathWidth, previousPoint.y]);
+		sideA.push([previousPoint.x - pathWidth, previousPoint.y]);
+		sideA.push([currentPoint.x - pathWidth, currentPoint.y]);
+
+		sideB.push([currentPoint.x - pathWidth, currentPoint.y]);
+		sideB.push([currentPoint.x + pathWidth, currentPoint.y]);
+		sideB.push([previousPoint.x + pathWidth, previousPoint.y]);
+*/
+
+
+
+
+		// append new rectangle to output
 		sideA.forEach( (element) => {
-			verticesFromPath[pathVerticeIndex] = element;
+			verticesFromPath[pathVerticeIndex] = element[0];
+			pathVerticeIndex++;
+			verticesFromPath[pathVerticeIndex] = element[1];
 			pathVerticeIndex++;
 		});
 		sideB.forEach( (element) => {
-			verticesFromPath[pathVerticeIndex] = element;
+			verticesFromPath[pathVerticeIndex] = element[0];
+			pathVerticeIndex++;
+			verticesFromPath[pathVerticeIndex] = element[1];
 			pathVerticeIndex++;
 		});
 
@@ -431,13 +443,12 @@ function draw(programInfo) {
 	gl.uniform1f(programInfo.uniformLocations.zoomLoc, programInfo.viewData.scale);
 
 	// Draw the geometry.
-	// circle
+	// demo circle
 	drawTriangleFanObject(constructCircle(0.2,[-0.5,0.5],30));
-	// path
-		// TODO refactor target: make 'pathGeo' a programInfo attribute, set to null when not displaying
-	let pathGeo = constructLatLongPath(null);
-	console.log(pathGeo);
-	drawTrianglesObject(pathGeo);
+	// demo path
+	programInfo.geometry.path = constructLatLongPath(null);
+	console.log(programInfo.geometry.path);
+	drawTrianglesObject(programInfo.geometry.path);
 
 }
 

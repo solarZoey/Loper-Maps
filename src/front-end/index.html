@@ -7,10 +7,45 @@
     <link rel="stylesheet" type="text/css" href="/src/index.css">
     <title>front-end</title>
   </head>
+
   <body>
+    <!-- testing query field  -->
+    <form>
+      <fieldset>
+        <legend>pathfinding!</legend>
+        
+        <ul>
+          <li>
+            <label for="desitnation-select">destination</label>
+            <select name="destination" id="destination-select">
+              <option name="DSCH">Discovery Hall</option>
+              <option name="CTW">Centennial Towers West</option>
+              <option name="CTE">Centennial Towers East</option>
+              <option name="COPE">Copeland Hall</option>
+              <option name="FAB">Fine Art Building</option>
+            </select>
+          </li>
+
+          <li>
+            <label for="source-select">source</label>
+            <select name="source" id="source-select">
+              <option name="DSCH">Discovery Hall</option>
+              <option name="CTW">Centennial Towers West</option>
+              <option name="CTE">Centennial Towers East</option>
+              <option name="COPE">Copeland Hall</option>
+              <option name="FAB">Fine Art Building</option>
+            </select>
+          </li>
+        </ul>
+
+      </fieldset>
+    </form>
+
+
     <div id="root">
       <p>loading...</p>
     </div>
     <script type="module" src="/src/main.jsx"></script>
+
   </body>
 </html>
