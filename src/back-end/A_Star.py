@@ -91,7 +91,7 @@ class Graph:
 
         while queue:
             current = queue.pop(0)
-            print(f"\nVisiting {current.name}")
+            print(f"\nChecking {current.name}")
             print(f"G Cost: {current.g}")
             print(f"Heuristic Value: {current.h:.2f}")
             print(f"F Cost: {current.f:.2f}")
@@ -116,14 +116,15 @@ class Graph:
                 tentative_g = current.g + edge.weight # Calculates tentative cost to reach neighbor from initial node
 
                 if tentative_g < neighbor.g: # If new path is better
-                    print(f"Updating G Cost: {current.name} to {neighbor.name}")
+                    print(f"Updating G Cost (path is cheaper): {current.name} to {neighbor.name}")
                     neighbor.g = tentative_g # Updates neighbor's g cost to cheaper path
-                    print(f"\nCalculating Heurisitc for {neighbor.name}")
+                    print(f"\nRecalculating Heurisitc for {neighbor.name}")
                     neighbor.h = self.calcHeuristic(neighbor, goal)
                     neighbor.f = neighbor.g + neighbor.h # Sum of heuristic value and g cost
                     neighbor.setBacktrack(current)
 
                     if neighbor in queue:
+                        print(f"Removing {neighbor.name} from queue")
                         queue.remove(neighbor)
                     if neighbor not in processed:
                         queue.append(neighbor)
@@ -373,7 +374,7 @@ def test():
 
 
     # Calculates A* based on specified nodes (start, end)
-    s1 = x.a_star(MantorRandall, Bruner)
+    s1 = x.a_star(CTW, Bruner)
     print(f"\nA* Path: {s1}\n")
 
 
