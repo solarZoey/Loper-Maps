@@ -9,8 +9,16 @@ class Live_Tracking:
     __wait_time = -1
 
     # init
+    def __init__(self):
+        self.set_live_lat(float(self.retrieve_location()[0]))
+        self.set_live_long(float(self.retrieve_location()[1]))
 
     # helpers
+    def retrieve_location(self):
+        response = requests.get('https://ipinfo.io/')
+        data = response.json()
+        location = data['loc'].split(',')
+        return location
 
     # getters
     def get_live_lat(self):
@@ -33,13 +41,3 @@ class Live_Tracking:
         self.__wait_time = wait_time
 
     # tostring
-
-response = requests.get('https://ipinfo.io/')
-data = response.json()
-
-
-while(True):
-    time.sleep(.01)
-    loc = data['loc'].split(',')
-    lat, long = float(loc[0]), float(loc[1])
-    print(lat, long)
