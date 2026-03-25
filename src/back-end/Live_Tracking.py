@@ -8,6 +8,7 @@ class Live_Tracking:
     __live_long = -1
     __wait_time = -1
 
+
     # init
     def __init__(self):
         self.set_live_lat(float(self.retrieve_location()[0]))
@@ -19,6 +20,9 @@ class Live_Tracking:
         data = response.json()
         location = data['loc'].split(',')
         return location
+
+    def find_nearest_node(self):
+        pass
 
     # getters
     def get_live_lat(self):
