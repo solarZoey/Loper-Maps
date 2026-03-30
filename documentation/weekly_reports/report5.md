@@ -12,7 +12,7 @@ Nova Solarz (it/they/she)
 Summary of Activities This Week
 Nova - 
 
-Christian - 
+Christian - Started looking into live tracking and accurate geolocation using cell tower triangulation.
 
 Cooper - Added West Campus sub nodes and connected them to COE, Discovery Hall, and West Center. Started adding more sub nodes on East Campus.
 
@@ -21,7 +21,7 @@ Gavin - Created a Live_tracking.py file and used the haversine_formula to calcul
 Progress Made
 Nova - 
 
-Christian - 
+Christian - Successfully retrieved location using a google api for cellular networks.
 
 Cooper - A large majority of the West Campus sub nodes have been added, which consequently now connects the entire campus together. I've been adding more of the pathways in East Campus, but there are quite a few of them so it takes a good amount of time. I do not anticipate it will take too much longer to add the rest of the sub nodes, a few of them not get added either if they are not accurate or necessary.
 
@@ -30,7 +30,7 @@ Gavin - Successfully implemented the haversine forumula to calculate distance an
 Challenges or Issues Encountered:
 Nova - 
 
-Christian -
+Christian - I have run into an issue of accuracy when i am retrieving locaiton. I just need to look into it further.
 
 Cooper - There haven't been any major challenges to make note of for my tasks. I would say the manual process of finding the coordinates for each sub node and manually entering it into the code takes a lot of time.
 
@@ -39,7 +39,7 @@ Gavin - The current program used to retrieve the users location does not retirev
 Plans for Next Week:
 Nova - 
 
-Christian - 
+Christian - Continue looking to googles api for cellular use and narrow down the accuracy.
 
 Cooper - Next week I plan on continuing to add the remaining sub nodes, hopefully by the end of the week most of them can be added which will allow me to start focusing on another task or helping other complete their tasks.
 
