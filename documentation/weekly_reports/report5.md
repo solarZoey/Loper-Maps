@@ -16,7 +16,7 @@ Christian -
 
 Cooper - Added West Campus sub nodes and connected them to COE, Discovery Hall, and West Center. Started adding more sub nodes on East Campus.
 
-Gavin - 
+Gavin - Created a Live_tracking.py file and used the haversine_formula to calculate distance between nodes.
 
 Progress Made
 Nova - 
@@ -25,7 +25,7 @@ Christian -
 
 Cooper - A large majority of the West Campus sub nodes have been added, which consequently now connects the entire campus together. I've been adding more of the pathways in East Campus, but there are quite a few of them so it takes a good amount of time. I do not anticipate it will take too much longer to add the rest of the sub nodes, a few of them not get added either if they are not accurate or necessary.
 
-Gavin -
+Gavin - Successfully implemented the haversine forumula to calculate distance and can choose the correct node that is the shortest distance away. 
 
 Challenges or Issues Encountered:
 Nova - 
@@ -34,7 +34,7 @@ Christian -
 
 Cooper - There haven't been any major challenges to make note of for my tasks. I would say the manual process of finding the coordinates for each sub node and manually entering it into the code takes a lot of time.
 
-Gavin - 
+Gavin - The current program used to retrieve the users location does not retireve the correct longitude and latitude. 
 
 Plans for Next Week:
 Nova - 
@@ -43,4 +43,4 @@ Christian -
 
 Cooper - Next week I plan on continuing to add the remaining sub nodes, hopefully by the end of the week most of them can be added which will allow me to start focusing on another task or helping other complete their tasks.
 
-Gavin - 
+Gavin - Fix the incorrect location retriever then implement the live_tracking.py into the main py file. 
