@@ -2,6 +2,9 @@
 import requests
 import time
 import math
+import subprocess
+import js2py
+import pyexecjs2
 
 class Live_Tracking:
     # data attributes
@@ -120,11 +123,28 @@ class Live_Tracking:
 
     def haversine_formula(self, check_node_lat_rad, check_node_long_rad, nodes):
         earth_radius = 3959
-        distance = 2*earth_radius* math.asin(math.sqrt(math.sin((self.get_live_lat_rad()-check_node_lat_rad)/2)**2) + math.cos(check_node_lat_rad) * math.cos(self.get_live_lat_rad()) * math.sin(self.get_live_long_rad() - check_node_long_rad) ** 2)
+        distance = 2 * earth_radius * math.asin(
+            math.sqrt(
+                math.sin((self.get_live_lat_rad() - check_node_lat_rad) / 2) ** 2 +
+                math.cos(self.get_live_lat_rad()) *
+                math.cos(check_node_lat_rad) *
+                math.sin((self.get_live_long_rad() - check_node_long_rad) / 2) ** 2
+            )
+        )
         if distance<self.get_closest_value():
             self.set_closest_value(distance)
             print(self.get_closest_value(), nodes)
 
+
+    def run_java_script(self):
+        test_code = """
+            let map;
+            let marker;
+            let watchId;
+
+        """
+        result = js2py.eval_js6(test_code)
+        print(result)
 
     def find_nearest_node(self):
         print(self.retrieve_location())
@@ -168,6 +188,6 @@ class Live_Tracking:
         self.__closest_value = closest_value
     # tostring
 
-test = Live_Tracking()
 
-test.get_check_node_radians()
+test = Live_Tracking()
+test.run_java_script()
