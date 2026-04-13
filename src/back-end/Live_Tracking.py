@@ -4,7 +4,6 @@ import time
 import math
 import subprocess
 import js2py
-import pyexecjs2
 
 class Live_Tracking:
     # data attributes
@@ -138,12 +137,21 @@ class Live_Tracking:
 
     def run_java_script(self):
         test_code = """
-            let map;
-            let marker;
-            let watchId;
+                let watchId;
 
-        """
-        result = js2py.eval_js6(test_code)
+                watchId = navigator.geolocation.watchPosition(updatePosition,error,{enableHighAccuracy:true,maximumAge:0,timeout:5000});
+
+                    function updatePosition(position){
+                      let lat = position.coords.latitude;
+                      let lon = position.coords.longitude;
+                      console.log(lat, lon);
+                    }
+                    
+                    function error(){
+                      alert("Unable to get location");
+                    }
+                """
+        result = js2py.eval_js(test_code)
         print(result)
 
     def find_nearest_node(self):
@@ -189,5 +197,21 @@ class Live_Tracking:
     # tostring
 
 
-test = Live_Tracking()
-test.run_java_script()
+#test = Live_Tracking()
+#test.run_java_script()
+
+import gps
+
+# Connect to the local gpsd daemon
+session = gps.gps(mode=gps.WATCH_ENABLE)
+
+try:
+    while True:
+        report = session.next()
+        if report['class'] == 'TPV':
+            latitude = getattr(report, 'lat', None)
+            longitude = getattr(report, 'lon', None)
+            if latitude and longitude:
+                print(f"Latitude: {latitude}, Longitude: {longitude}")
+except KeyboardInterrupt:
+    print("Stopped.")
