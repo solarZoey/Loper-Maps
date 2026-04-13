@@ -527,7 +527,7 @@ def test():
     x.addConnection(sn170, sn166, 138.05)
     x.addConnection(sn166, sn124, 105.81)
     x.addConnection(sn124, sn123, 32.13)
-    x.addConnection(sn123, Copeland, 1) # Copeland South Entrance
+    x.addConnection(sn123, Copeland, 100) # Copeland South Entrance
     x.addConnection(sn124, sn125, 23.86)
     x.addConnection(sn125, sn163, 151.15)
     x.addConnection(sn163, sn168, 122.6)
@@ -545,7 +545,7 @@ def test():
     x.addConnection(sn120, sn124, 132.06)
     x.addConnection(sn113, sn108, 136.87)
     x.addConnection(sn108, NesterSouth, 10) # Nester South, South Entrance
-    x.addConnection(sn170, Copeland, 10) # Copeland East Entrance
+    x.addConnection(sn170, Copeland, 100) # Copeland East Entrance
     x.addConnection(sn188, sn214, 298.2)
     x.addConnection(sn214, sn216, 108.32)
     x.addConnection(sn216, sn239, 413.51)
@@ -553,13 +553,13 @@ def test():
     x.addConnection(sn239, sn238, 389.8)
     x.addConnection(sn238, HealthSports, 50) # Health and Sports Center West Entrance
     x.addConnection(sn238, sn245, 201.31)
-    x.addConnection(sn245, sn246, 98.38)
-    x.addConnection(sn246, COE, 5) # COE South-East Entrance
+    x.addConnection(sn245, sn246, 120)
+    x.addConnection(sn246, COE, 50) # COE South-East Entrance
     x.addConnection(sn245, sn253, 378.62)
     x.addConnection(sn253, sn239, 212.69)
-    x.addConnection(sn245, sn247, 197.47)
+    x.addConnection(sn245, sn247, 150)
     x.addConnection(sn247, COE, 30) # COE North Entrance
-    x.addConnection(sn247, sn256, 671.63)
+    x.addConnection(sn247, sn256, 700)
     x.addConnection(sn256, sn254, 410.7)
     x.addConnection(sn254, sn253, 823.74)
     x.addConnection(sn256, Discovery, 100) # Discovery Hall East Entrance
@@ -602,7 +602,7 @@ def test():
     x.addConnection(sn86, sn97, 23.78)
     x.addConnection(sn87, sn97, 32.24)
     x.addConnection(sn97, sn91, 33.3)
-    x.addConnection(sn91, Union, 25) # Union Southern Entrance
+    x.addConnection(sn91, Union, 200) # Union Southern Entrance
     x.addConnection(sn91, sn81, 85.09)
     x.addConnection(sn81, sn78, 113.53)
     x.addConnection(sn66, sn64, 70.93)
@@ -686,10 +686,13 @@ def test():
     x.addConnection(sn173, sn174, 77.89)
     x.addConnection(sn180, sn181, 77.9)
     x.addConnection(sn180, sn188, 145.3)
+    x.addConnection(sn169, sn199, 48.43)
+    x.addConnection(sn199, sn200, 31.71)
+    x.addConnection(sn232, FineArts, 100) # Fine Arts East Entrance
 
 
     # Calculates A* based on specified nodes (start, end)
-    s1 = x.a_star(Martin, Thomas)
+    s1 = x.a_star(CTW, COE)
     print(f"\nA* Path: {s1}\n")
 
 
