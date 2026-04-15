@@ -4,6 +4,7 @@ import time
 import math
 import subprocess
 import js2py
+from flask import Flask
 
 class Live_Tracking:
     # data attributes
@@ -24,10 +25,25 @@ class Live_Tracking:
 
     # helpers
     def retrieve_location(self):
-        response = requests.get('https://ipinfo.io/')
-        data = response.json()
-        location = data['loc'].split(',')
+        app = Flask(__name__)
+
+        @app.route("/")
+        def home():
+            return '<script src="static/test.js"></script>'
+
+        @app.route("/location", methods=["POST"])
+        def location():
+            from flask import request
+            data = request.json
+            location = [data["lat"], data["lon"]]
+            return "OK"
+
+        app.run(debug=True)
+
         return location
+
+
+
 
     def node_library(self):
         campus_nodes = {
@@ -135,25 +151,6 @@ class Live_Tracking:
             print(self.get_closest_value(), nodes)
 
 
-    def run_java_script(self):
-        test_code = """
-                let watchId;
-
-                watchId = navigator.geolocation.watchPosition(updatePosition,error,{enableHighAccuracy:true,maximumAge:0,timeout:5000});
-
-                    function updatePosition(position){
-                      let lat = position.coords.latitude;
-                      let lon = position.coords.longitude;
-                      console.log(lat, lon);
-                    }
-                    
-                    function error(){
-                      alert("Unable to get location");
-                    }
-                """
-        result = js2py.eval_js(test_code)
-        print(result)
-
     def find_nearest_node(self):
         print(self.retrieve_location())
 
@@ -197,21 +194,6 @@ class Live_Tracking:
     # tostring
 
 
-#test = Live_Tracking()
-#test.run_java_script()
+test = Live_Tracking()
 
-import gps
-
-# Connect to the local gpsd daemon
-session = gps.gps(mode=gps.WATCH_ENABLE)
-
-try:
-    while True:
-        report = session.next()
-        if report['class'] == 'TPV':
-            latitude = getattr(report, 'lat', None)
-            longitude = getattr(report, 'lon', None)
-            if latitude and longitude:
-                print(f"Latitude: {latitude}, Longitude: {longitude}")
-except KeyboardInterrupt:
-    print("Stopped.")
+test.get_check_node_radians()
