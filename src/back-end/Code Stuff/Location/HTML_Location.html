@@ -1,0 +1,88 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Location</title>
+</head>
+<body>
+  <div id="demo">Getting your location...</div>
+  <script>
+    const output = document.getElementById("demo");
+    let watchId = null;
+
+    const geoOptions = {
+      enableHighAccuracy: true,
+      timeout: 10000,
+      maximumAge: 0
+    };
+
+    // map code can listen for this event.
+    function LocationUpdate(position) {
+      window.dispatchEvent(new CustomEvent("location:update", {
+        detail: {
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+          accuracy: position.coords.accuracy,
+          heading: position.coords.heading,
+          speed: position.coords.speed,
+          timestamp: position.timestamp
+        }
+      }));
+    }
+
+    function showPosition(position) {
+      const { latitude, longitude, accuracy, heading, speed } = position.coords;
+
+      output.innerHTML =
+        "Latitude: " + latitude +
+        "<br>Longitude: " + longitude +
+        "<br>Accuracy: " + accuracy + " meters" +
+        "<br>Heading: " + (heading ?? "N/A") +
+        "<br>Speed: " + (speed ?? "N/A");
+
+      LocationUpdate(position);
+    }
+
+    function showError(error) {
+      switch (error.code) {
+        case error.PERMISSION_DENIED:
+          output.textContent = "Location access denied. Please allow location permissions.";
+          break;
+        case error.POSITION_UNAVAILABLE:
+          output.textContent = "Location information is unavailable.";
+          break;
+        case error.TIMEOUT:
+          output.textContent = "Location request timed out. Try again.";
+          break;
+        default:
+          output.textContent = "An unknown geolocation error occurred.";
+      }
+    }
+
+    function startLocationTracking() {
+      if (!navigator.geolocation) {
+        output.textContent = "Geolocation is not supported by this browser.";
+        return;
+      }
+
+      // Initial fix for fast first load, then continuous updates for map movement.
+      navigator.geolocation.getCurrentPosition(showPosition, showError, geoOptions);
+      watchId = navigator.geolocation.watchPosition(showPosition, showError, geoOptions);
+    }
+
+    function stopLocationTracking() {
+      if (watchId !== null) {
+        navigator.geolocation.clearWatch(watchId);
+        watchId = null;
+      }
+    }
+
+    // Expose controls for integration with other scripts/maps.
+    window.startLocationTracking = startLocationTracking;
+    window.stopLocationTracking = stopLocationTracking;
+
+    startLocationTracking();
+  </script>
+</body>
+</html>
