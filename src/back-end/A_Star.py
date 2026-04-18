@@ -689,10 +689,11 @@ def test():
     x.addConnection(sn169, sn199, 48.43)
     x.addConnection(sn199, sn200, 31.71)
     x.addConnection(sn232, FineArts, 100) # Fine Arts East Entrance
+    x.addConnection(sn212, sn232, 113.31)
 
 
     # Calculates A* based on specified nodes (start, end)
-    s1 = x.a_star(CTW, COE)
+    s1 = x.a_star(Discovery, CTE)
     print(f"\nA* Path: {s1}\n")
 
 
