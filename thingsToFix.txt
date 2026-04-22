@@ -1,0 +1,6 @@
+Fix-It-List
+
+1. (finished) make sure paths are created correctly
+2. make sure on mobile, it does not refresh when pulling down on the screen
+3. make the satellite map line up with node map
+    3a. make sure the user can manipulate (zoom, move) the map and that both the map and nodes move the same

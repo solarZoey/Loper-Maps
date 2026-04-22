@@ -9,7 +9,7 @@ Directive:
 // wait half a second for html elements to load before starting graphics
 console.log("waiting...")
 setTimeout(function() {
-	console.log("woaw!!!")
+	console.log("waiting to load graphics")
 	main();
 }, 500);
 

@@ -12,6 +12,7 @@ const DEBUG_MODE = "debug";
 
 const CSV_PATH = path.join(__dirname, "Database", "campusBuilding_longlat.csv");
 const PYTHON_SCRIPT = path.join(__dirname, "..", "A_Star.py");
+const ASTAR_PATH = path.join(__dirname, "..", "A_Star.py");
 
 // Helper function for conditional logging
 function log(message, level = "minimal") {
@@ -55,6 +56,27 @@ function loadBuildingDirectory(csvPath = CSV_PATH) {
 	return directory;
 }
 
+function loadAStarNodeDirectory(aStarPath = ASTAR_PATH) {
+	const raw = fs.readFileSync(aStarPath, "utf8");
+	const regex = /\b[A-Za-z0-9_]+\s*=\s*Node\("([^"]+)",\s*([-0-9.]+),\s*([-0-9.]+)\)/g;
+	const directory = new Map();
+
+	let match = regex.exec(raw);
+	while (match) {
+		const name = match[1].trim();
+		const latitude = Number(match[2]);
+		const longitude = Number(match[3]);
+
+		if (name && Number.isFinite(latitude) && Number.isFinite(longitude)) {
+			directory.set(normalizeName(name), { name, latitude, longitude });
+		}
+
+		match = regex.exec(raw);
+	}
+
+	return directory;
+}
+
 function resolveBuilding(name, directory) {
 	const normalized = normalizeName(name);
 	if (!normalized) return null;
@@ -81,12 +103,13 @@ function buildPathPayload(aStarResult, csvPath = CSV_PATH) {
 			? aStarResult.path: [];
 
 	const directory = loadBuildingDirectory(csvPath);
+	const aStarDirectory = loadAStarNodeDirectory();
 	const cleanedPath = sanitizePath(pathList);
 
 	const missing = [];
 	const nodes = cleanedPath
 		.map((name, index) => {
-			const match = resolveBuilding(name, directory);
+			const match = resolveBuilding(name, directory) || aStarDirectory.get(normalizeName(name));
 			if (!match) {
 				missing.push(name);
 				// Include node even without coordinates
@@ -176,13 +199,46 @@ function runPythonPathfinding(startBuilding, goalBuilding) {
  */
 function parsePythonOutput(output) {
 	const lines = output.split(/\r?\n/);
+	let machineResult = null;
 	let path = null;
 	let totalCost = null;
+	let reportedError = null;
 	
 	// Debug: log the raw output
 	log("=== RAW PYTHON OUTPUT ===", "debug");
 	log(output, "debug");
 	log("=== END RAW OUTPUT ===\n", "debug");
+
+	for (const line of lines) {
+		const marker = "JSON_RESULT:";
+		const markerIndex = line.indexOf(marker);
+		if (markerIndex === -1) continue;
+
+		const jsonText = line.slice(markerIndex + marker.length).trim();
+		if (!jsonText) continue;
+
+		try {
+			machineResult = JSON.parse(jsonText);
+			break;
+		} catch {
+			// Fall back to legacy plain text parsing.
+		}
+	}
+
+	if (machineResult) {
+		const parsedPath = sanitizePath(machineResult.path);
+		const parsedCost = Number(machineResult.totalCost);
+		const parsedError = typeof machineResult.error === "string" ? machineResult.error.trim() : "";
+
+		if (parsedPath.length === 0) {
+			throw new Error(parsedError || "Python returned an empty route");
+		}
+
+		return {
+			path: parsedPath,
+			totalCost: Number.isFinite(parsedCost) ? parsedCost : null,
+		};
+	}
 	
 	for (const line of lines) {
 		// Look for "A* Path: ['Building1', 'Building2', ...]"
@@ -204,10 +260,15 @@ function parsePythonOutput(output) {
 			totalCost = parseFloat(costMatch[1]);
 			log(`Parsed totalCost: ${totalCost}`, "debug");
 		}
+
+		const errorMatch = line.match(/^Error:\s*(.+)$/i);
+		if (errorMatch) {
+			reportedError = errorMatch[1].trim();
+		}
 	}
 	
 	if (!path) {
-		throw new Error("Could not find path in Python output");
+		throw new Error(reportedError || "Could not find path in Python output");
 	}
 	
 	log(`\nFinal parsed result: path=${JSON.stringify(path)}, totalCost=${totalCost}\n`, "debug");

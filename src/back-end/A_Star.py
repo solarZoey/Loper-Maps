@@ -1,5 +1,6 @@
 import math
 import sys
+import json
 
 # Node Class representing each building on campus
 class Node:
@@ -691,10 +692,24 @@ def test():
     x.addConnection(sn232, FineArts, 100) # Fine Arts East Entrance
     x.addConnection(sn212, sn232, 113.31)
 
+    """
+    # West Campus?
+    x.addConnection(GeneralServices, Facilities, round(x.calcHeuristic(GeneralServices, Facilities), 2))
+    x.addConnection(GeneralServices, Ockinga, round(x.calcHeuristic(GeneralServices, Ockinga), 2))
+    x.addConnection(Ockinga, CommunicationsCenter, round(x.calcHeuristic(Ockinga, CommunicationsCenter), 2))
+    x.addConnection(CommunicationsCenter, FrankHouse, round(x.calcHeuristic(CommunicationsCenter, FrankHouse), 2))
+    x.addConnection(FrankHouse, RuralHealth, round(x.calcHeuristic(FrankHouse, RuralHealth), 2))
+    x.addConnection(RuralHealth, UNMC, round(x.calcHeuristic(RuralHealth, UNMC), 2))
+    x.addConnection(UNMC, VillageFlats, round(x.calcHeuristic(UNMC, VillageFlats), 2))
+    x.addConnection(Facilities, sn254, round(x.calcHeuristic(Facilities, sn254), 2))
+    x.addConnection(GeneralServices, sn254, round(x.calcHeuristic(GeneralServices, sn254), 2))
+    """
 
     # Calculates A* based on specified nodes (start, end)
+    """
     s1 = x.a_star(Discovery, CTE)
     print(f"\nA* Path: {s1}\n")
+    """
 
 
     # Christian's Playground
@@ -711,23 +726,48 @@ def test():
     print((f"\nA* Path: {s2}\n"))
     """
 
-    # Errors are not handling correctly yet, just returning python exit
+    def emit_result(path, total_cost, error=None):
+        payload = {
+            "path": path if isinstance(path, list) else [],
+            "totalCost": total_cost,
+            "error": error,
+        }
+        # Stable contract line for Directory_Processor.js
+        print(f"JSON_RESULT: {json.dumps(payload)}")
+
+    if len(sys.argv) < 3:
+        message = "Error: Expected START_BUILDING and GOAL_BUILDING arguments."
+        print(message)
+        emit_result([], None, message)
+        sys.exit(1)
+
     try:
         start_building = sys.argv[1]
         goal_building = sys.argv[2]
-                
+
         # Create normalized lookup dictionary
         node_dict = {node.name.replace(" ", "").lower(): node for node in x._nodes}
-                
+
         # Normalize and get nodes
         start_node = node_dict[start_building.replace(" ", "").lower()]
         goal_node = node_dict[goal_building.replace(" ", "").lower()]
-                
+
         s2 = x.a_star(start_node, goal_node)
+        if not s2:
+            message = f"Error: No route found from {start_building} to {goal_building}."
+            print(message)
+            emit_result([], None, message)
+            sys.exit(1)
+
+        total_cost = None if goal_node.g == float('inf') else goal_node.g
         print(f"\nA* Path: {s2}\n")
-        print(f"Total Cost: {goal_node.g}\n")
+        if total_cost is not None:
+            print(f"Total Cost: {total_cost}\n")
+        emit_result(s2, total_cost)
     except KeyError:
-        print(f"Error: Building not found. Please check your input and try again.")
+        message = "Error: Building not found. Please check your input and try again."
+        print(message)
+        emit_result([], None, message)
         sys.exit(1)
 
 if __name__ == "__main__":
