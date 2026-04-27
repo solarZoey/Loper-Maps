@@ -90,6 +90,14 @@
 	margin: 0.3rem 0;
 }
 
+.desktop-status-card {
+	display: block;
+}
+
+.mobile-status-card {
+	display: none;
+}
+
 .error-text {
 	color: #b91c1c;
 	font-weight: 700;
@@ -116,6 +124,12 @@
 	background: #f7f8fa;
 	border-radius: 6px;
 	border: 1px solid #d8dde5;
+	touch-action: none;
+	cursor: grab;
+}
+
+.map-canvas:active {
+	cursor: grabbing;
 }
 
 .map-overlay-image {
@@ -129,30 +143,34 @@
 
 .graph-edge {
 	stroke: #ffffff;
-	stroke-width: 2;
+	stroke-width: 2.6;
 	stroke-linecap: round;
 	opacity: 0.65;
+	vector-effect: non-scaling-stroke;
 }
 
 .route-line {
 	fill: none;
 	stroke: #ef4444;
-	stroke-width: 5;
+	stroke-width: 6.5;
 	stroke-linecap: round;
 	stroke-linejoin: round;
 	opacity: 0.95;
+	vector-effect: non-scaling-stroke;
 }
 
 .waypoint-node {
 	fill: #4b5563;
-	cursor: pointer;
+	stroke: #f8fafc;
+	stroke-width: 1.2;
+	cursor: default;
 }
 
 .building-node {
 	fill: #0f766e;
 	stroke: #ffffff;
 	stroke-width: 1.5;
-	cursor: pointer;
+	cursor: default;
 }
 
 .user-node {
@@ -179,6 +197,10 @@
 	flex-wrap: wrap;
 }
 
+.adjustment-controls {
+	display: flex;
+}
+
 .map-help-text {
 	margin: 0.5rem 0 0;
 	font-size: 0.88rem;
@@ -188,9 +210,64 @@
 @media (max-width: 980px) {
 	.app-shell {
 		grid-template-columns: 1fr;
+		gap: 0.6rem;
+		padding: 0.6rem;
+	}
+
+	.panel {
+		padding: 0.75rem;
+	}
+
+	.controls-panel h1 {
+		font-size: 1.55rem;
+	}
+
+	.subtitle {
+		font-size: 0.92rem;
+		margin-bottom: 0.7rem;
+	}
+
+	.button-row {
+		margin-bottom: 0.8rem;
+	}
+
+	.button-row button {
+		flex: 1;
+	}
+
+	.primary-btn,
+	.secondary-btn,
+	.route-btn {
+		padding: 0.62rem 0.78rem;
+		font-size: 0.95rem;
+	}
+
+	.input {
+		font-size: 0.95rem;
 	}
 
 	.map-canvas {
-		height: min(60vh, 640px);
+		height: min(56vh, 520px);
+	}
+
+	.desktop-status-card {
+		display: none;
+	}
+
+	.mobile-status-card {
+		display: block;
+		margin-top: 0.65rem;
+	}
+
+	.adjustment-controls {
+		display: flex;
+	}
+
+	.adjustment-controls .secondary-btn {
+		width: 100%;
+	}
+
+	.map-help-text {
+		font-size: 0.83rem;
 	}
 }

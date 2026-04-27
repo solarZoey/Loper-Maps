@@ -139,6 +139,14 @@ function readRequestJson(req) {
   })
 }
 
+function getRequestPath(req) {
+  try {
+    return new URL(req.url ?? '/', 'http://localhost').pathname
+  } catch {
+    return req.url ?? '/'
+  }
+}
+
 function directoryProcessorBridge() {
   const backendRoot = path.resolve(__dirname, '../back-end')
   const workspaceSrcRoot = path.resolve(__dirname, '..')
@@ -146,6 +154,7 @@ function directoryProcessorBridge() {
   const csvPath = path.join(backendRoot, 'Code Stuff', 'Database', 'campusBuilding_longlat.csv')
   const aStarPath = path.join(backendRoot, 'A_Star.py')
   const mapImagePath = path.join(workspaceSrcRoot, 'images', 'UNK_Page_Campus_Map.png')
+  let latestLocation = null
 
   return {
     name: 'directory-processor-bridge',
@@ -192,6 +201,47 @@ function directoryProcessorBridge() {
         } catch (error) {
           sendJson(res, 500, {
             error: 'Failed to load map overlay image',
+            details: String(error.message ?? error),
+          })
+        }
+      })
+
+      server.middlewares.use(async (req, res, next) => {
+        const requestPath = getRequestPath(req)
+
+        if (requestPath !== '/location' && requestPath !== '/api/location') {
+          next()
+          return
+        }
+
+        if (req.method !== 'POST') {
+          sendJson(res, 405, { error: 'Method not allowed' })
+          return
+        }
+
+        try {
+          const body = await readRequestJson(req)
+          const lat = Number(body?.lat)
+          const lon = Number(body?.lon)
+
+          if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
+            sendJson(res, 400, { error: 'lat and lon are required' })
+            return
+          }
+
+          latestLocation = {
+            lat,
+            lon,
+            receivedAt: new Date().toISOString(),
+          }
+
+          sendJson(res, 200, {
+            ok: true,
+            location: latestLocation,
+          })
+        } catch (error) {
+          sendJson(res, 500, {
+            error: 'Failed to store location update',
             details: String(error.message ?? error),
           })
         }
@@ -281,10 +331,14 @@ function directoryProcessorBridge() {
 }
 
 // https://vite.dev/config/
-export default defineConfig({
-  plugins: [react(), basicSsl(), directoryProcessorBridge()],
-  server: {
-    https: true,
-    host: true,
-  },
+export default defineConfig(({ command, mode }) => {
+  const useHttps = command === 'serve' && mode !== 'dev-http'
+
+  return {
+    plugins: [react(), ...(useHttps ? [basicSsl()] : []), directoryProcessorBridge()],
+    server: {
+      https: useHttps,
+      host: true,
+    },
+  }
 })

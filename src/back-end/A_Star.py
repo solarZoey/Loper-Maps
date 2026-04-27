@@ -692,7 +692,7 @@ def test():
     x.addConnection(sn232, FineArts, 100) # Fine Arts East Entrance
     x.addConnection(sn212, sn232, 113.31)
 
-    """
+ 
     # West Campus?
     x.addConnection(GeneralServices, Facilities, round(x.calcHeuristic(GeneralServices, Facilities), 2))
     x.addConnection(GeneralServices, Ockinga, round(x.calcHeuristic(GeneralServices, Ockinga), 2))
@@ -703,7 +703,7 @@ def test():
     x.addConnection(UNMC, VillageFlats, round(x.calcHeuristic(UNMC, VillageFlats), 2))
     x.addConnection(Facilities, sn254, round(x.calcHeuristic(Facilities, sn254), 2))
     x.addConnection(GeneralServices, sn254, round(x.calcHeuristic(GeneralServices, sn254), 2))
-    """
+
 
     # Calculates A* based on specified nodes (start, end)
     """
@@ -753,6 +753,7 @@ def test():
         goal_node = node_dict[goal_building.replace(" ", "").lower()]
 
         s2 = x.a_star(start_node, goal_node)
+
         if not s2:
             message = f"Error: No route found from {start_building} to {goal_building}."
             print(message)

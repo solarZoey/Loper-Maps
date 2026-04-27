@@ -8,7 +8,8 @@ https://vite.dev/guide/
 
 - cd into this directory from a terminal
 - `npm run dev`
-- open link displayed
+- open the `https://` link displayed
+- if you need plain HTTP for testing, run `npm run dev:http`
 
 WIP
 
