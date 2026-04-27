@@ -712,7 +712,7 @@ function App() {
 
 					setOverlayTransform((previous) => {
 						const scaleDelta = distance / pinchStateRef.current.distance
-						const nextScale = Math.min(2.2, Math.max(0.4, previous.scale * scaleDelta))
+						const nextScale = Math.min(8, Math.max(0.4, previous.scale * scaleDelta))
 						const scaleFactor = nextScale / previous.scale
 
 						return {
@@ -804,7 +804,7 @@ function App() {
 
 		setOverlayTransform((previous) => {
 			const delta = event.deltaY < 0 ? 1.08 : 0.92
-			const nextScale = Math.min(2.2, Math.max(0.4, previous.scale * delta))
+			const nextScale = Math.min(8, Math.max(0.4, previous.scale * delta))
 			const scaleFactor = nextScale / previous.scale
 
 			return {
