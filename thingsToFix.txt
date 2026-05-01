@@ -1,9 +1,9 @@
 Fix-It-List
 
 1. (finished) make sure paths are created correctly
-2. make sure on mobile, it does not refresh when pulling down on the screen
-3. make the satellite map line up with node map
-    3a. make sure the user can manipulate (zoom, move) the map and that both the map and nodes move the same
-4. Currently the path fully updates around every 15 seconds, but it would look better if the front end on the users device just dynamically
+2. (finished)make sure on mobile, it does not refresh when pulling down on the screen
+3. (finishedd )make the satellite map line up with node map
+    3a. (finished)make sure the user can manipulate (zoom, move) the map and that both the map and nodes move the same
+4. (finished)Currently the path fully updates around every 15 seconds, but it would look better if the front end on the users device just dynamically
     created a path from them to the nearest node on the path, then, every 15 seconds, the path may update or change and then the front end
     updates the nearest code
