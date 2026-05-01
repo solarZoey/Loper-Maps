@@ -27,7 +27,7 @@ const MAP_OVERLAY_BOUNDS = {
 const OVERLAY_BASE_WIDTH = 1200
 
 const DEFAULT_GEO_CALIBRATION = {
-	offsetX: -0.5,
+	offsetX: -0.5	 ,
 	offsetY: -56,
 	scaleX: 0.865,
 	scaleY: 0.905,
@@ -306,6 +306,22 @@ function App() {
 	const rerouteInFlightRef = useRef(false)
 	const lastBackendRefreshRef = useRef(0)
 
+	function resetDragInteraction() {
+		dragStateRef.current = null
+		pinchStateRef.current = null
+		touchPointsRef.current.clear()
+	}
+
+	function safeReleasePointerCapture(target, pointerId) {
+		try {
+			if (target?.hasPointerCapture(pointerId)) {
+				target.releasePointerCapture(pointerId)
+			}
+		} catch {
+			// Ignore invalid pointer capture states from out-of-bounds releases.
+		}
+	}
+
 	useEffect(() => {
 		let cancelled = false
 
@@ -353,6 +369,24 @@ function App() {
 			if (watchIdRef.current !== null) {
 				navigator.geolocation.clearWatch(watchIdRef.current)
 			}
+		}
+	}, [])
+
+	useEffect(() => {
+		function handleWindowPointerUp() {
+			resetDragInteraction()
+		}
+
+		function handleWindowBlur() {
+			resetDragInteraction()
+		}
+
+		window.addEventListener('pointerup', handleWindowPointerUp)
+		window.addEventListener('blur', handleWindowBlur)
+
+		return () => {
+			window.removeEventListener('pointerup', handleWindowPointerUp)
+			window.removeEventListener('blur', handleWindowBlur)
 		}
 	}, [])
 
@@ -746,6 +780,11 @@ function App() {
 			return
 		}
 
+		if (event.buttons === 0) {
+			resetDragInteraction()
+			return
+		}
+
 		const dx = event.clientX - dragStateRef.current.startClientX
 		const dy = event.clientY - dragStateRef.current.startClientY
 
@@ -777,9 +816,7 @@ function App() {
 				dragStateRef.current = null
 			}
 
-			if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-				event.currentTarget.releasePointerCapture(event.pointerId)
-			}
+			safeReleasePointerCapture(event.currentTarget, event.pointerId)
 			return
 		}
 
@@ -787,9 +824,7 @@ function App() {
 			dragStateRef.current = null
 		}
 
-		if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-			event.currentTarget.releasePointerCapture(event.pointerId)
-		}
+		safeReleasePointerCapture(event.currentTarget, event.pointerId)
 	}
 
 	function handleOverlayWheel(event) {
@@ -920,6 +955,7 @@ function App() {
 					onPointerMove={handleOverlayDrag}
 					onPointerUp={stopOverlayDrag}
 					onPointerCancel={stopOverlayDrag}
+					onLostPointerCapture={resetDragInteraction}
 					onWheel={handleOverlayWheel}
 					onDragStart={preventNativeDrag}
 					onDragOver={preventNativeDrag}
